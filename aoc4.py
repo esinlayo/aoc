@@ -4,6 +4,8 @@ endval = 820401
 start = [3,5,9,2,8,2]
 end = [8,2,0,4,0,1]
 
+## Note: ya it's ugly, I just wanted it done fast
+
 def buildNumber(arr):
     num = 0
     for p,val in enumerate(reversed(arr)):
@@ -11,12 +13,15 @@ def buildNumber(arr):
     return num
 
 def go():
+
     count = 0
     def helper(i, pw=[]):
+        def yaAllowed(i, j):
+            return pw[i] == pw[j] and not ((i-1 >= 0 and pw[i-1] == pw[i]) or (j+1 < 6 and pw[j] == pw[j+1]))
         nonlocal count
         if i >= 6:
             if not (startval <= buildNumber(pw) <= endval): return
-            if pw[0] == pw[1] or pw[1] == pw[2] or pw[2] == pw[3] or pw[3] == pw[4] or pw[4] == pw[5]: 
+            if yaAllowed(0, 1) or yaAllowed(1,2) or yaAllowed(2,3) or yaAllowed(3,4) or yaAllowed(4,5):
                 print("yay", pw)
                 count += 1
             else:
@@ -24,7 +29,7 @@ def go():
             return
         
         if i == 0:
-            for j in range(3, 8+1):
+            for j in range(3, 10):
                 pw.append(j)
                 helper(1, pw)
                 pw.pop()
