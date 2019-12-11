@@ -1,85 +1,63 @@
-from program7 import amplifier, Amplifier
+from IntcodeComputer import IntcodeComputer as Amplifier
 
 f=open("aoc7.txt", "r")
 
-program = f.readline()
+mem = f.readline()
+mem = mem.strip("\n").split(",")
+mem = [int(num) for num in mem]
+mem.extend([0 for _ in range(len(mem)*len(mem))])
 
-program = program.strip("\n").split(",")
-program = [int(num) for num in program]
-
-seqs = []
-def generate_sequences(have = set(), sequence = []):
+def generate_sequences(iter, have = set(), sequence = [], allSeqs = []):
     if len(have) == 5:
-        seqs.append(sequence[:])
+        allSeqs.append(sequence[:])
         return
-    for i in range(5):
+    for i in iter:
         if i not in have:
             have.add(i)
             sequence.append(i)
-            generate_sequences(have, sequence)
+            generate_sequences(iter, have, sequence)
             sequence.pop()
             have.remove(i)
-
-generate_sequences()
+    return allSeqs
 
 
 max_output = 0
-max_seq = None
-print(program, 'p')
-print()
-for seq in seqs:
+for seq in generate_sequences(range(5)):
     p1, p2, p3, p4, p5 =  seq
-    A = amplifier(program, [0, p1], 'A')
-    B = amplifier(program, [A, p2], 'B')
-    C = amplifier(program, [B, p3], 'C')
-    D = amplifier(program, [C, p4], 'D')
-    E = amplifier(program, [D, p5], 'E')
-    max_output = max(max_output, E)
-print(max_output, max_seq)
+    A = Amplifier(mem, p1)
+    B = Amplifier(mem, p2)
+    C = Amplifier(mem, p3)
+    D = Amplifier(mem, p4)
+    E = Amplifier(mem, p5)
+    a = A.run([0])
+    b = B.run([a])
+    c = C.run([b])
+    d = D.run([c])
+    e = E.run([d])
+    max_output = max(max_output, E.output[-1])
+print("Part1", max_output)
 
 
+print("--------------------------------------------------------------------------")
 
 
 max_output = 0
-seqs = []
-def generate_sequences2(have = set(), sequence = []):
-    if len(have) == 5:
-        seqs.append(sequence[:])
-        return
-    for i in range(5,10):
-        if i not in have:
-            have.add(i)
-            sequence.append(i)
-            generate_sequences2(have, sequence)
-            sequence.pop()
-            have.remove(i)
-generate_sequences2()
-
-
-for seq in seqs:
-    print(seq)
+for seq in generate_sequences(range(5,10)):
     p1, p2, p3, p4, p5 =  seq
-    
-    A = Amplifier(program, p1, 'A')
-    B = Amplifier(program, p2, 'B')
-    C = Amplifier(program, p3, 'C')
-    D = Amplifier(program, p4, 'D')
-    E = Amplifier(program, p5, 'E')
+    A = Amplifier(mem, p1)
+    B = Amplifier(mem, p2)
+    C = Amplifier(mem, p3)
+    D = Amplifier(mem, p4)
+    E = Amplifier(mem, p5)
     
     res = 0
     while True:
-        res = A.run(res)
-        #print(seq, 'donea', res)
-        res = B.run(res)
-        #print(seq, 'doneb', res)
-        res = C.run(res)
-        res = D.run(res)
-        res = E.run(res)
+        res = A.run([res])
+        res = B.run([res])
+        res = C.run([res])
+        res = D.run([res])
+        res = E.run([res])
+        if E.halted: break
+    max_output = max(max_output, E.output[-1])
+print("Part2", max_output)
 
-        max_output = max(max_output, res)
-        if E.halted: 
-            print('GAHHHHHHHH'*5)
-            break
-print(max_output)
-        
-    
