@@ -3,7 +3,6 @@ from IntcodeComputer import IntcodeComputer
 def createMem(str):
     str = str.strip("\n").split(",")
     str = [int(num) for num in str]
-    str.extend([0 for _ in range(len(str)*len(str))])
     return str
 
 def simpleTest(machine, input, expectedO):
@@ -94,11 +93,11 @@ def generate_sequences(iter, have = set(), sequence = [], allSeqs = []):
 max_output = 0
 for seq in generate_sequences(range(5)):
     p1, p2, p3, p4, p5 =  seq
-    A = Amplifier(mem, p1)
-    B = Amplifier(mem, p2)
-    C = Amplifier(mem, p3)
-    D = Amplifier(mem, p4)
-    E = Amplifier(mem, p5)
+    A = Amplifier(mem,[p1])
+    B = Amplifier(mem,[p2])
+    C = Amplifier(mem,[p3])
+    D = Amplifier(mem,[p4])
+    E = Amplifier(mem,[p5])
     a = A.run([0])
     b = B.run([a])
     c = C.run([b])
@@ -110,11 +109,11 @@ print("Day 7 Part 1:", max_output)
 max_output = 0
 for seq in generate_sequences(range(5,10)):
     p1, p2, p3, p4, p5 =  seq
-    A = Amplifier(mem, p1)
-    B = Amplifier(mem, p2)
-    C = Amplifier(mem, p3)
-    D = Amplifier(mem, p4)
-    E = Amplifier(mem, p5)
+    A = Amplifier(mem,[p1])
+    B = Amplifier(mem,[p2])
+    C = Amplifier(mem,[p3])
+    D = Amplifier(mem,[p4])
+    E = Amplifier(mem,[p5])
     
     res = 0
     while True:

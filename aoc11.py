@@ -1,4 +1,4 @@
-from EmergencyHullRobot import EmergencyHullRobot
+from IntcodeComputer import IntcodeComputer
 
 '''
 emergency hull painting robot
@@ -23,31 +23,57 @@ Then, the program will output two values:
 '''
 
 
-def createMem(str):
-    str = str.strip("\n").split(",")
-    str = [int(num) for num in str]
-    str.extend([0 for _ in range(len(str)*len(str))])
-    return str
+def createMem(str): return list(map(int, str.strip("\n").split(",")))
 
 
-f=open("aoc11.txt", "r")
-emergencyHullRobot = EmergencyHullRobot(
-    createMem(f.readline()), startcolor=0)
-while (not emergencyHullRobot.halted):
-    emergencyHullRobot.run()
-# print(emergencyHullRobot.outputs)
+f = open("aoc11.txt", "r")
+
+robot = IntcodeComputer(createMem(f.readline()))
+robot.dir, robot.pos, robot.visited = 0, [0, 0], {}
+increments = {0: (0, 1), 1: (1, 0), 2: (0, -1), 3: (-1, 0)}
+while (not robot.halted):
+    robot.run([robot.visited.get(tuple(robot.pos), 0)])
+    robot.run()
+
+    if robot.output:
+        robot.visited[tuple(robot.pos)] = robot.output[0]
+        robot.dir += 1 if robot.output[1] == 1 else -1
+        if robot.dir == 4:
+            robot.dir = 0
+        if robot.dir == -1:
+            robot.dir = 3
+        inc = increments[robot.dir]
+        robot.pos = list([pos+inc[i] for i, pos in enumerate(robot.pos)])
+        robot.output.clear()
 # print(emergencyHullRobot.visited)
-print("Part 1:", len(emergencyHullRobot.visited))
+print("Part 1:", len(robot.visited))
 
 
 print("---------------------------")
 print("Part 2:")
-emergencyHullRobot = EmergencyHullRobot(createMem(open("aoc11.txt", "r").readline()), startcolor=1)
-while (not emergencyHullRobot.halted):
-    emergencyHullRobot.run()
+f = open("aoc11.txt", "r")
+robot = IntcodeComputer(createMem(f.readline()))
+robot.dir, robot.pos, robot.visited = 0, [0, 0], {(0, 0): 1}
+increments = {0: (0, 1), 1: (1, 0), 2: (0, -1), 3: (-1, 0)}
+while (not robot.halted):
+    robot.run([robot.visited.get(tuple(robot.pos), 0)])
+    robot.run()
+
+    if robot.output:
+        robot.visited[tuple(robot.pos)] = robot.output[0]
+        robot.dir += 1 if robot.output[1] == 1 else -1
+        if robot.dir == 4:
+            robot.dir = 0
+        if robot.dir == -1:
+            robot.dir = 3
+        inc = increments[robot.dir]
+        robot.pos = list([pos+inc[i] for i, pos in enumerate(robot.pos)])
+        robot.output.clear()
+
+
 maxX, maxY = float("-inf"), float("-inf")
 minX, minY = float("+inf"), float("+inf")
-for coord, color in emergencyHullRobot.visited.items():
+for coord, color in robot.visited.items():
     maxX = max(maxX, coord[0])
     minX = min(minX, coord[0])
     maxY = max(maxX, coord[1])
@@ -62,7 +88,7 @@ image = [[' ' for _ in range(Xlength)] for _ in range(Ylength)]
 
 symbol = {0: '.', 1: '#'}
 
-for coord, color in emergencyHullRobot.visited.items():
+for coord, color in robot.visited.items():
     coordx, coordy = coord
     image[coordx+abs(minX)][coordy+abs(minY)] = symbol[color]
 
