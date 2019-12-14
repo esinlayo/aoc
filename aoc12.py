@@ -18,7 +18,7 @@ class Moon:
             
 #f = open("aoc12.txt", "r")
 #x = f.readlines()
-#x = list(filter(lambda x: len(x) > 0, map(lambda x: x.strip('\n<>'), x)))            
+#x = [x.strip('\n<>') for x in f.readlines() if len(x.strip('\n')) > 0]   
 moons = [Moon(14,9,14), Moon(9,11,6), Moon(-6,14,-4), Moon(4,-4,-3)]
 test = [Moon(-1,0,2), Moon(2,-10,-7), Moon(4,-8,8), Moon(3,5,-1)]
 

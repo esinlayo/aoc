@@ -29,55 +29,49 @@ def createMem(str): return list(map(int, str.strip("\n").split(",")))
 f = open("aoc11.txt", "r")
 
 robot = IntcodeComputer(createMem(f.readline()))
-robot.dir, robot.pos, robot.visited = 0, [0, 0], {}
+direct, pos, visited = 0, [0, 0], {}
 increments = {0: (0, 1), 1: (1, 0), 2: (0, -1), 3: (-1, 0)}
 while (not robot.halted):
-    robot.run([robot.visited.get(tuple(robot.pos), 0)])
+    robot.run([visited.get(tuple(pos), 0)])
     robot.run()
 
     if robot.output:
-        robot.visited[tuple(robot.pos)] = robot.output[0]
-        robot.dir += 1 if robot.output[1] == 1 else -1
-        if robot.dir == 4:
-            robot.dir = 0
-        if robot.dir == -1:
-            robot.dir = 3
-        inc = increments[robot.dir]
-        robot.pos = list([pos+inc[i] for i, pos in enumerate(robot.pos)])
+        visited[tuple(pos)] = robot.output[0]
+        direct += 1 if robot.output[1] == 1 else -1
+        if direct == 4:  direct = 0
+        if direct == -1: direct = 3
+        inc = increments[direct]
+        pos = ([i+j for i, j in zip(pos, inc)])
         robot.output.clear()
-# print(emergencyHullRobot.visited)
-print("Part 1:", len(robot.visited))
+# print(emergencyHullvisited)
+print("Part 1:", len(visited))
 
 
 print("---------------------------")
 print("Part 2:")
 f = open("aoc11.txt", "r")
 robot = IntcodeComputer(createMem(f.readline()))
-robot.dir, robot.pos, robot.visited = 0, [0, 0], {(0, 0): 1}
+direct, pos, visited = 0, [0, 0], {(0, 0): 1}
 increments = {0: (0, 1), 1: (1, 0), 2: (0, -1), 3: (-1, 0)}
 while (not robot.halted):
-    robot.run([robot.visited.get(tuple(robot.pos), 0)])
+    robot.run([visited.get(tuple(pos), 0)])
     robot.run()
 
     if robot.output:
-        robot.visited[tuple(robot.pos)] = robot.output[0]
-        robot.dir += 1 if robot.output[1] == 1 else -1
-        if robot.dir == 4:
-            robot.dir = 0
-        if robot.dir == -1:
-            robot.dir = 3
-        inc = increments[robot.dir]
-        robot.pos = list([pos+inc[i] for i, pos in enumerate(robot.pos)])
+        visited[tuple(pos)] = robot.output[0]
+        direct += 1 if robot.output[1] == 1 else -1
+        if direct == 4: direct = 0
+        if direct == -1: direct = 3
+        inc = increments[direct]
+        pos = list([pos+inc[i] for i, pos in enumerate(pos)])
         robot.output.clear()
 
 
 maxX, maxY = float("-inf"), float("-inf")
 minX, minY = float("+inf"), float("+inf")
-for coord, color in robot.visited.items():
-    maxX = max(maxX, coord[0])
-    minX = min(minX, coord[0])
-    maxY = max(maxX, coord[1])
-    minY = min(minY, coord[1])
+for coord, color in visited.items():
+    maxX, minX = max(maxX, coord[0]), min(minX, coord[0])
+    maxY, minY = max(maxX, coord[1]), min(minY, coord[1])
 Xlength = abs(minX)+abs(maxX)+1
 Ylength = abs(minY)+abs(maxY)+1
 print('X range', minX, maxX, 'X length', Xlength)
@@ -88,7 +82,7 @@ image = [[' ' for _ in range(Xlength)] for _ in range(Ylength)]
 
 symbol = {0: '.', 1: '#'}
 
-for coord, color in robot.visited.items():
+for coord, color in visited.items():
     coordx, coordy = coord
     image[coordx+abs(minX)][coordy+abs(minY)] = symbol[color]
 
