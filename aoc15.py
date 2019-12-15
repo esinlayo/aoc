@@ -16,7 +16,7 @@ fewest_steps = float("inf")
 machine = IntcodeComputer(createMem(f.readline()))
 
 
-def run(currmachine, visited, coords):
+def run(currmachine, visited, coords, doneFound=False):
     global fewest_steps
     #print(f"running {currmachine} {coords}")
     if coords in visited:
@@ -33,7 +33,7 @@ def run(currmachine, visited, coords):
         pass
     elif last_output == PROGRESSING:
         run(currmachine, visited, (coords[0], coords[1]+1))
-    elif last_output == DONE:
+    elif last_output == DONE and not doneFound:
         print(len(currmachine.output))
         fewest_steps = min(fewest_steps, len(currmachine.output))
 
@@ -45,7 +45,7 @@ def run(currmachine, visited, coords):
         pass
     elif last_output == PROGRESSING:
         run(currmachine, visited, (coords[0], coords[1]-1))
-    elif last_output == DONE:
+    elif last_output == DONE and not doneFound:
         print(len(currmachine.output))
         fewest_steps = min(fewest_steps, len(currmachine.output))
 
@@ -56,7 +56,7 @@ def run(currmachine, visited, coords):
         pass
     elif last_output == PROGRESSING:
         run(currmachine, visited, (coords[0]-1, coords[1]))
-    elif last_output == DONE:
+    elif last_output == DONE and not doneFound:
         print(len(currmachine.output))
         fewest_steps = min(fewest_steps, len(currmachine.output))
 
@@ -67,7 +67,7 @@ def run(currmachine, visited, coords):
         pass
     elif last_output == PROGRESSING:
         run(currmachine, visited, (coords[0]+1, coords[1]))
-    elif last_output == DONE:
+    elif last_output == DONE and not doneFound:
         print(len(currmachine.output))
         fewest_steps = min(fewest_steps, len(currmachine.output))
 
