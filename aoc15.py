@@ -1,4 +1,5 @@
 from IntcodeComputer import IntcodeComputer
+from copy import deepcopy
 import os
 import sys
 sys.setrecursionlimit(1000000000)
@@ -14,68 +15,43 @@ NOPOSCHANGE, PROGRESSING, DONE = 0, 1, 2
 
 fewest_steps = float("inf")
 machine = IntcodeComputer(createMem(f.readline()))
+most_steps = float("-inf")
+
+
+coordincs = {1: (0, 1), 2: (0, -1), 3: (-1, 0), 4: (1, 0)}
 
 
 def run(currmachine, visited, coords, doneFound=False):
-    global fewest_steps
-    #print(f"running {currmachine} {coords}")
+    def dooby(i, currmem, curroutput):
+        global fewest_steps
+        global most_steps
+        currmachine.run([i])
+        last_output = currmachine.output[-1]
+        if last_output == NOPOSCHANGE:
+            if doneFound:
+                most_steps = max(most_steps, len(currmachine.output))
+        elif last_output == PROGRESSING:
+            coordinc = coordincs[i]
+            run(currmachine, visited,
+                (coords[0]+coordincs[i][0], coords[1]+coordincs[i][1]))
+        elif last_output == DONE and not doneFound:
+            print("fk")
+            fewest_steps = min(fewest_steps, len(currmachine.output))
+            currmachine.output.clear()
+            run(deepcopy(currmachine), set(), coords, True)
+
+    #print(coords, doneFound)
     if coords in visited:
         return
     visited.add(coords)
-
-    currmem = currmachine.mem[:]
-    curroutput = currmachine.output[:]
-
-    currmachine.mem, currmachine.output = currmem[:], curroutput[:]
-    currmachine.run([1])
-    last_output = currmachine.output[-1]
-    if last_output == NOPOSCHANGE:
-        pass
-    elif last_output == PROGRESSING:
-        run(currmachine, visited, (coords[0], coords[1]+1))
-    elif last_output == DONE and not doneFound:
-        print(len(currmachine.output))
-        fewest_steps = min(fewest_steps, len(currmachine.output))
-
-    currmachine.mem, currmachine.output = currmem[:], curroutput[:]
-    currmachine.run([2])
-    last_output = currmachine.output[-1]
-    # print(last_output)
-    if last_output == NOPOSCHANGE:
-        pass
-    elif last_output == PROGRESSING:
-        run(currmachine, visited, (coords[0], coords[1]-1))
-    elif last_output == DONE and not doneFound:
-        print(len(currmachine.output))
-        fewest_steps = min(fewest_steps, len(currmachine.output))
-
-    currmachine.mem, currmachine.output = currmem[:], curroutput[:]
-    currmachine.run([3])
-    last_output = currmachine.output[-1]
-    if last_output == NOPOSCHANGE:
-        pass
-    elif last_output == PROGRESSING:
-        run(currmachine, visited, (coords[0]-1, coords[1]))
-    elif last_output == DONE and not doneFound:
-        print(len(currmachine.output))
-        fewest_steps = min(fewest_steps, len(currmachine.output))
-
-    currmachine.mem, currmachine.output = currmem[:], curroutput[:]
-    currmachine.run([4])
-    last_output = currmachine.output[-1]
-    if last_output == NOPOSCHANGE:
-        pass
-    elif last_output == PROGRESSING:
-        run(currmachine, visited, (coords[0]+1, coords[1]))
-    elif last_output == DONE and not doneFound:
-        print(len(currmachine.output))
-        fewest_steps = min(fewest_steps, len(currmachine.output))
+    for i in range(1, 5):
+        dooby(i, currmachine.mem[:], currmachine.output[:])
 
     visited.remove(coords)
 
 
-visited = set()
 print("running")
-run(machine, visited, (0, 0))
+run(machine, set(), (0, 0))
 print("fewest_steps: ", fewest_steps)
+print("most_steps: ", most_steps)
 print("done")
